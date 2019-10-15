@@ -1,0 +1,57 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add expressjs mongoose passportjs bcrypt --save
+
+PATH: 
+  C:\Users\Queensdesigner\AppData\Local\Programs\Git\mingw64\bin;C:\Users\Queensdesigner\AppData\Local\Programs\Git\usr\bin;C:\Users\Queensdesigner\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\app\gsareenadmin\product\11.2.0\dbhome_1\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\Program Files (x86)\Intel\iCLS Client;C:\Program Files\Intel\iCLS Client;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\WiFi\bin;C:\Program Files\Common Files\Intel\WirelessCommon;C:\Program Files (x86)\Common Files\Lenovo;C:\SWTOOLS\ReadyApps;C:\Program Files (x86)\QuickTime\QTSystem;C:\Program Files\PuTTY;C:\Program Files (x86)\Yarn\bin;C:\Users\Queensdesigner\AppData\Local\Programs\python\Python37;%PYTHON;C:\Program Files\nodejs;C:\Program Files (x86)\PDFtk\bin;C:\Users\Queensdesigner\AppData\Local\Programs\Python\Python37\Scripts;C:\Users\Queensdesigner\AppData\Local\Programs\Python\Python37;C:\Ruby24-x64\bin;C:\Ruby25-x64\bin;C:\Users\Queensdesigner\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Queensdesigner\AppData\Local\Programs\Git\cmd;C:\Users\Queensdesigner\AppData\Local\Yarn\bin;C:\Users\Queensdesigner\AppData\Roaming\npm;C:\Program Files\Java\jdk-12.0.1\bin;C:\Users\Queensdesigner\AppData\Local\inkdrop\bin
+
+Yarn version: 
+  1.9.4
+
+Node version: 
+  11.1.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/passportjs: Not found
+      at Request.params.callback [as _callback] (C:\Program Files (x86)\Yarn\lib\cli.js:64202:18)
+      at Request.self.callback (C:\Program Files (x86)\Yarn\lib\cli.js:137468:22)
+      at Request.emit (events.js:182:13)
+      at Request.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:138440:10)
+      at Request.emit (events.js:182:13)
+      at IncomingMessage.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:138362:12)
+      at Object.onceWrapper (events.js:273:13)
+      at IncomingMessage.emit (events.js:187:15)
+      at endReadableNT (_stream_readable.js:1094:12)
+      at process.internalTickCallback (internal/process/next_tick.js:72:19)
+
+npm manifest: 
+  {
+    "name": "mern",
+    "version": "1.0.0",
+    "description": "An underlying MERN stack boilerplate with REDUX and JWT authentication.",
+    "main": "server.js",
+    "scripts": {
+      "test": "npm run dev"
+    },
+    "keywords": [
+      "MERN",
+      "stack",
+      "MongoDB",
+      "ExpressJS",
+      "React",
+      "Redux",
+      "PassportJS",
+      "JWT",
+      "NodeJS"
+    ],
+    "author": "Shivdeep Singh ( Oxcean Cloud Services )",
+    "license": "ISC"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
