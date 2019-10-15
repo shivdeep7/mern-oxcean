@@ -1,0 +1,22 @@
+{
+  "name": "mern",
+  "version": "1.0.0",
+  "description": "An underlying MERN stack boilerplate with REDUX and JWT authentication.",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm run dev"
+  },
+  "keywords": [
+    "MERN",
+    "stack",
+    "MongoDB",
+    "ExpressJS",
+    "React",
+    "Redux",
+    "PassportJS",
+    "JWT",
+    "NodeJS"
+  ],
+  "author": "Shivdeep Singh ( Oxcean Cloud Services )",
+  "license": "ISC"
+}
