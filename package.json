@@ -4,8 +4,8 @@
   "description": "An underlying MERN stack boilerplate with REDUX and JWT authentication.",
   "main": "server.js",
   "scripts": {
-    "test": "npm run dev",
-    "dev": "nodemon server.js"
+    "start": "node server",
+    "server": "nodemon server.js"
   },
   "keywords": [
     "MERN",

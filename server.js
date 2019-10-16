@@ -1,6 +1,11 @@
 // Get the required module
 const express = require("express");
+const connectDB = require("./config/db");
+
 const app = express();
+
+// Connect to the database
+connectDB();
 
 // Get the routes
 const users = require("./routes/api/users");
