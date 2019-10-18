@@ -1,3 +1,4 @@
 {
-    "mongoURI": "mongodb+srv://shiv:methree@boilerplate-od2vg.mongodb.net/test?retryWrites=true&w=majority"
+    "mongoURI": "mongodb+srv://shiv:methree@boilerplate-od2vg.mongodb.net/test?retryWrites=true&w=majority",
+    "jwtSecretKey": "oxceancloudishereautherdeep"
 }
