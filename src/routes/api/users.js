@@ -87,7 +87,6 @@ router.post("/register", [
 
         // Return the response
         return res.status(500).send("Server error")
-
     }
 
     
