@@ -5,7 +5,8 @@ import './App.css';
 // Import the components as pages
 import Login from "./components/auth/Login.js";
 import Register from "./components/auth/Register.js";
-import Dashboard from "./components/layout/Dashboard.js";
+import Dashboard from "./components/pages/Dashboard.js";
+import EmptyPage from "./components/pages/EmptyPage.js";
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
         <Route exact path="/dashboard" component={Dashboard} />
+        <Route exact path="/Empty" component={EmptyPage} />
       </Switch>
     </Router>
   );

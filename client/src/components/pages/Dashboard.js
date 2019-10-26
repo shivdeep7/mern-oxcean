@@ -2,8 +2,8 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types'
 
 // Import the sub components
-import NavBar from "./NavBar.js";
-import ListView from "./ListView.js";
+import NavBar from "../layout/NavBar.js";
+import ListView from "../layout/ListView.js";
 
 
 const Dashboard = props => {
