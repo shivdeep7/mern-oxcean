@@ -16,7 +16,7 @@ const User = require("../../models/Users");
  * @Desc    Get the user infomrmation
  * @Access  Private
  **/
-router.get("/me", auth, async (req, res) => {
+router.get("/", auth, async (req, res) => {
 
     // Get the user data
     try {
@@ -58,14 +58,14 @@ router.post("/login", [
         const user = await User.findOne({ email });
 
         if (!email) {
-            return res.status(400).json({"msg": "Invalid login credentials"});
+            return res.status(400).json({ errors: [{"msg": "Invalid login credentials"}]});
         }
 
         // Check if password is valid
         passwordMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordMatch) {
-            return res.status(400).json({"msg": "Invalid login credentials"});
+            return res.status(400).json({ errors: [{"msg": "Invalid login credentials"}]});
         }
 
         // Compose a payload

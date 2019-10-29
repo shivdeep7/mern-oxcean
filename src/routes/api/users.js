@@ -45,7 +45,7 @@ router.post("/register", [
         let user = await User.findOne({ email });
 
         if (user) {
-            res.status(400).json({ error: [{msg: "User already exits"}]})
+            res.status(400).json({ errors: [{msg: "User already exits"}]})
         }
 
         // Create a user instance 
