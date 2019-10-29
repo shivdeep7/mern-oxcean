@@ -1,10 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from "react-redux";
+ 
+// Redux
+import { logout } from "../../actions/auth"
 
 // Import the UI components
 import { Pane, Card, Avatar, Button, Text, Tab, Popover, Menu, Position, toaster } from "evergreen-ui";
 
-const NavBar = props => {
+const NavBar = ({logout}) => {
+
+
     return (
         <Pane className="NavBar">
             <Card>
@@ -21,23 +27,20 @@ const NavBar = props => {
             		<Menu>
             			<Menu.Group>
             				<Menu.Item>Profile</Menu.Item>
-            				<Menu.Item>Logout</Menu.Item>
+            				<Menu.Item onSelect={() => logout()}>Logout</Menu.Item>
             			</Menu.Group>
             		</Menu>
             	}
             >
-                <Avatar className="dropdown-account" name="Shivdeep Singh" size={33} />
+        	<Avatar className="dropdown-account" name="Shivdeep Singh" size={33} />
             </Popover>
             </nav>
-            
-
-            
         </Pane>
     )
 }
 
 NavBar.propTypes = {
-
+	logout: PropTypes.func.isRequired
 }
 
-export default NavBar;
+export default connect(null, {logout})(NavBar);
