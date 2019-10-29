@@ -19,6 +19,7 @@ import Alerts from './components/layout/Alerts.js';
 
 // Import utils
 import { setDefaultToken } from "./utils/setDefaultToken";
+import PrivateRoute from "./routing/PrivateRoute";
 
 // Set the token
  if (localStorage.token) {
@@ -40,8 +41,8 @@ function App() {
           <Route exact path="/login" component={Login} />
           <Route exact path="/register" component={Register} />
           <Route exact path="/forgot-password" component={ForgotPassword} />
-          <Route exact path="/dashboard" component={Dashboard} />
-          <Route exact path="/Empty" component={EmptyPage} />
+          <PrivateRoute exact path="/dashboard" component={Dashboard} />
+          <PrivateRoute exact path="/Empty" component={EmptyPage} />
         </Switch>
       </Router>
     </Provider>
