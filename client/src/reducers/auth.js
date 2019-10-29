@@ -1,12 +1,12 @@
-import { REGISTER_SUCCESS, REGISTER_FAIL } from "../action/types";
+import { REGISTER_SUCCESS, REGISTER_FAIL } from "../actions/types";
 
-initialState = {
+const initialState = {
     token: localStorage.getItem("token"),
     isAuthenticated: null,
-    loading: 
+    loading: false
 }
 
-export default (state = initialState, payload) => {
+export default (state = initialState, action) => {
 
     const { type, payload } = action;
     

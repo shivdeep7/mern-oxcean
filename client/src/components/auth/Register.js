@@ -11,11 +11,13 @@ import {
         Text,
         Heading
 } from "evergreen-ui";
+import { register } from '../../actions/auth.js';
 
-const Register = ({ setAlerts }) => {
+const Register = ({ setAlerts, register }) => {
 
         // Declare the state using hooks
         const [formData, setData] = useState({
+                name: "",
                 email: "",
                 password: "",
                 password2: ""
@@ -24,6 +26,7 @@ const Register = ({ setAlerts }) => {
 
         // Get the data our of state
         const {
+                name,
                 email,
                 password,
                 password2
@@ -41,6 +44,9 @@ const Register = ({ setAlerts }) => {
                 if ( password !== password2 ) {
                         setAlerts("Password does match with confirm password", "danger");
                 }
+
+                // Register user
+                register({ name, email, password });
         }
 
         // Return
@@ -53,6 +59,17 @@ const Register = ({ setAlerts }) => {
                 flexDirection = "column" >
                 <img width = "200"
                 src = "https://bankingthefuture.com/wp-content/uploads/2019/04/dummylogo.jpg" / >
+                <
+                TextInput name = "name"
+                placeholder = "Full Name"
+                label = "Your name"
+                value = {
+                        name
+                }
+                onChange = {
+                        e => onChange(e)
+                }
+                required / >
                 <
                 TextInput name = "email"
                 placeholder = "Your Email"
@@ -99,4 +116,4 @@ const Register = ({ setAlerts }) => {
 }
 
 // Export the register component
-export default connect(null, {setAlerts})(Register);
+export default connect(null, {setAlerts, register})(Register);
