@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const config = require("config");
+const Users = require("../models/Users.js");
+const Groups = require("../models/Groups.js");
+const Roles = require("../models/Roles.js");
+const authentication = require("./authorization");
 
 // Middleware to check if user provided a valid token
 module.exports = auth = async (req, res, next) => {
@@ -13,13 +17,20 @@ module.exports = auth = async (req, res, next) => {
     try {
 
         const decoded =  jwt.verify(token, config.get("jwtSecretKey"));
-        req.user = decoded.user;
-        
+        req.user = await Users.findById(decoded.user.id).populate({
+            path: 'groups',
+            populate: {
+                path: 'roles',
+                populate: 'permissions.service'
+            }
+        }).select("-password");
+     
         // Move to the next middleware
-        next();
+        return authentication(req, res, next);
 
     } catch (err) {
 
+        console.log(err);
         return res.status(401).json({ "msg": "Access denied, Invalid token" });
 
     }

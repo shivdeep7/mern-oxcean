@@ -61,7 +61,6 @@ router.post("/register", [
 
         // Register a user in database
         await user.save();
-
         // Compose the payload
         const payload = {
             user: {
