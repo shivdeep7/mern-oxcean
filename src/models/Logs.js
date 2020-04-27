@@ -31,7 +31,10 @@ const LogsSchema = new mongoose.Schema({
         },
         method: String,
         path: String,
-        timelime: []
+        success: Boolean,
+        status: Number,
+        code: Number,
+        payload: Object,
     }]
 });
 

@@ -28,6 +28,8 @@ const RoleExitsByName = async (name, status) => {
 
 }
 
+
+
 // Get the role services
 const RoleServiceExits = async (permissions) => {
 
@@ -47,7 +49,29 @@ const RoleServiceExits = async (permissions) => {
     }
 }
 
+// Roles does not exits in the database
+const RolesExitsById = async (roles) => {
+
+    try {
+
+        const getRoles = await Roles.countDocuments({"_id": { $in: [ roles ] }});
+        
+        // Compare the array 
+        if ( roles.length !== getRoles ) {
+            return Promise.reject('Roles does not exits in database');
+        }
+
+    } catch (err) {
+ 
+         console.error(err);
+         return err;
+ 
+    }
+ 
+ }
+
 module.exports = {
     RoleExitsByName,
-    RoleServiceExits
+    RoleServiceExits,
+    RolesExitsById
 }

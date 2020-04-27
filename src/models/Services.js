@@ -13,8 +13,11 @@ const ServicesSchema = new mongoose.Schema({
     data: {
         type: String,
         required: true
+    },
+    type: {
+        type: String,
+        required: true
     }
-    
 });
 
 module.exports = Services = mongoose.model('Services', ServicesSchema);

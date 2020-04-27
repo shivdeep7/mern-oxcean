@@ -2,9 +2,13 @@
 const router = require("express").Router();
 const { check, validationResult, body } = require("express-validator");
 const Roles = require("../../models/Roles");
+const Groups = require("../../models/Groups");
+
 const rolesValidation = require("../../validation/Roles.js");
 const mongoose = require("mongoose");
+
 const auth = require("../../middleware/auth.js")
+
 /** 
 *   
 *   @Route      /api/roles
@@ -80,6 +84,11 @@ router.post("/delete",
 
         // Delete the role
         const deleteRole = await Roles.findOneAndDelete({ name: name });  
+        const id = deleteRole._id;
+
+        //Delete the reference
+        const deleteGroupReference = await Groups.findOneAndUpdate({ $pull: { "roles":  { $in: id}}})
+
         res.status(200).json(deleteRole);
 
     } catch (err) {
@@ -113,12 +122,12 @@ router.put("/",
         return res.status(400).json(errors);
     }
 
+    const { name, permissions } = req.body;
+
     try {
 
-        const { name } = req.body;
-
         // Delete the role
-        const editRole = await Roles.findOneAndUpdate({ name: name });  
+        const editRole = await Roles.findOneAndUpdate({ name: name }, { permissions });  
         res.status(200).json(editRole);
 
     } catch (err) {

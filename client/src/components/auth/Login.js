@@ -34,6 +34,7 @@ const Login = ({ login, auth: { isAuthenticated, loading } }) => {
     // On submit/click
     const onClick = () => {
         // Run the action
+        alert("hello");
         login(email, password);
     }
 
