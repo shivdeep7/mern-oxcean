@@ -57,11 +57,12 @@ router.post("/login", [
         // Check if email is valid
         const user = await User.findOne({ email });
 
-        if (!email) {
+        if (!user) {
             return res.status(400).json({ errors: [{"msg": "Invalid login credentials"}]});
         }
 
         // Check if password is valid
+
         passwordMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordMatch) {
