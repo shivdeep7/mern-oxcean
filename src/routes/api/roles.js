@@ -29,7 +29,14 @@ router.post("/", [auth,
     // Check the request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json(errors);
+        res.result = {
+            success: false, 
+            status: 400,
+            code: 88962,
+            payload: errors
+        }
+
+        return handler(req, res, next);
     }
 
     // Get the role info 
@@ -44,13 +51,33 @@ router.post("/", [auth,
         });
        
         const addRole = await role.save(role);
-        res.status(200).json(addRole)
+        res.result = {
+            success: true, 
+            status: 200,
+            code: 89289,
+            payload: addRole
+        }
+
+        return handler(req, res, next);
 
         
     } catch (err) {
 
-        console.log(err);
-        res.json(500).json(err);
+        // Log the error on console
+        res.result = {
+            success: false, 
+            status: 500,
+            code: 48344,
+            payload: {
+                errors: [
+                    {
+                        msg: err,
+                    }
+                ]
+            }
+        }
+
+        return handler(req, res, next);
 
     }
 
@@ -75,7 +102,14 @@ router.post("/delete",
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json(errors);
+        res.result = {
+            success: false, 
+            status: 400,
+            code: 43553,
+            payload: errors
+        }
+
+        return handler(req, res, next);
     }
 
     try {
@@ -119,7 +153,14 @@ router.put("/",
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json(errors);
+        res.result = {
+            success: false, 
+            status: 400,
+            code: 84783,
+            payload: errors
+        }
+
+        return handler(req, res, next);
     }
 
     const { name, permissions } = req.body;

@@ -22,11 +22,18 @@ router.post("/", [
     check("roles", "Roles are required to create a group").not().isEmpty(),
     body("name").custom((name) => groupsValidator.GroupExitsByName(name, true)),
     body("roles").custom((roles) => groupsValidator.GroupRoleExits(roles))
-], async (req, res) => {
+], async (req, res, next) => {
 
     const errors = validationResult(req);
     if ( !errors.isEmpty() ) {
-        return res.status(404).json(errors);
+        res.result = {
+            success: false, 
+            status: 400,
+            code: 37739,
+            payload: errors
+        }
+
+        return handler(req, res, next);
     }
 
     try {
@@ -37,10 +44,32 @@ router.post("/", [
         })
 
         const addGroup = await groups.save(groups);
-        return res.status(200).json(addGroup);
+        res.result = {
+            success: true, 
+            status: 200,
+            code: 32345,
+            payload: addGroup
+        }
+
+        return handler(req, res, next);
 
     } catch (err) {
-        console.log(err);
+      
+        // Log the error on console
+        res.result = {
+            success: false, 
+            status: 500,
+            code: 48344,
+            payload: {
+                errors: [
+                    {
+                        msg: err,
+                    }
+                ]
+            }
+        }
+
+        return handler(req, res, next);
     }
 
 

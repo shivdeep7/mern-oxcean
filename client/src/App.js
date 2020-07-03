@@ -39,7 +39,6 @@ function App() {
         <Alerts />
         <Switch>
           <Route exact path="/login" component={Login} />
-          <Route exact path="/register" component={Register} />
           <Route exact path="/forgot-password" component={ForgotPassword} />
           <PrivateRoute exact path="/dashboard" component={Dashboard} />
           <PrivateRoute exact path="/Empty" component={EmptyPage} />

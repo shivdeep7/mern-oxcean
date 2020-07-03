@@ -33,7 +33,15 @@ router.post("/", [
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        return res.status(400).json(errors);
+
+        res.result = {
+            success: false, 
+            status: 400,
+            code: 32553,
+            payload: errors
+        }
+
+        return handler(req, res, next);
     }
 
     try { 
@@ -51,12 +59,34 @@ router.post("/", [
 
         // Add a new permission to admin 
         await Roles.findOneAndUpdate({name: "Admin"}, { $push: { "permissions": { "service": id, "accessType": "full"}} });
+        
+        res.result = {
+            success: true, 
+            status: 200,
+            code: 43454,
+            payload: newService
+        }
 
-        res.status(200).json(newService);
+        return handler(req, res, next);
 
+    
     } catch (err) {
 
-        console.log(err);
+         // Log the error on console
+       res.result = {
+        success: false, 
+        status: 500,
+        code: 74823,
+        payload: {
+            errors: [
+                {
+                    msg: err,
+                }
+            ]
+        }
+    }
+
+    return handler(req, res, next);
 
     }
 
@@ -94,11 +124,32 @@ router.put("/", [
         };
 
         const editService = await Services.findOneAndUpdate({name: req.body.name}, data);
-        res.status(200).json(editService);
+        res.result = {
+            success: true, 
+            status: 200,
+            code: 38883,
+            payload: editService
+        }
+
+        return handler(req, res, next);
 
     } catch(err) {
 
-        console.log(err);
+         // Log the error on console
+         res.result = {
+            success: false, 
+            status: 500,
+            code: 48344,
+            payload: {
+                errors: [
+                    {
+                        msg: err,
+                    }
+                ]
+            }
+        }
+
+        return handler(req, res, next);
 
     }
 
@@ -137,7 +188,21 @@ router.delete("/", [
 
     } catch(err) {
 
-        console.log(err);
+        // Log the error on console
+        res.result = {
+            success: false, 
+            status: 500,
+            code: 54533,
+            payload: {
+                errors: [
+                    {
+                        msg: err,
+                    }
+                ]
+            }
+        }
+    
+        return handler(req, res, next);
 
     }
 

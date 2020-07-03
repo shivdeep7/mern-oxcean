@@ -17,7 +17,10 @@ module.exports = auth = async (req, res, next) => {
     try {
 
         const decoded =  jwt.verify(token, config.get("jwtSecretKey"));
-        req.user = await Users.findById(decoded.user.id).populate({
+        req.token = token; // Token for logging purposes
+        req.userId = decoded.user.id; // userId for loggin purposes
+        
+        req.user = await Users.findById(req.userId).populate({
             path: 'groups',
             populate: {
                 path: 'roles',

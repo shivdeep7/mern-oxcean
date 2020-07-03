@@ -42,7 +42,7 @@ const Login = ({ login, auth: { isAuthenticated, loading } }) => {
        return <Redirect to="/dashboard" />
     }
 
-    return ( 
+    return loading && ( 
         <Card className="loginForm"
         elevation = {
             1

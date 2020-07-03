@@ -52,7 +52,21 @@ module.exports = authorization = async ( req, res, next ) => {
 
    } catch (err) {
 
-      console.log(err);
+       // Log the error on console
+       res.result = {
+        success: false, 
+        status: 500,
+        code: 00024,
+        payload: {
+            errors: [
+                {
+                    msg: err,
+                }
+            ]
+        }
+    }
+
+    return handler(req, res, next);
 
    }
 

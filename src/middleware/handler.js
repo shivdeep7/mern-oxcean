@@ -1,43 +1,36 @@
 // Middelware to handle the response
 const uuid = require("uuid");
-const Logs = require("../modles/Logs.js");
+const mongoose = require("mongoose");
+const Logger = require("./Logger.js");
 
 const handler = async ( req, res, next ) => {
 
    try {
 
-        if ( res.response && res.id ) {
+        if ( req.requestId != "" ) {
 
-            // Error type
-            const { status, code, data } = res.response; 
-            const { user, requestId  } = res;
+            const { success, status, code, payload } = res.result; 
 
-            // Create a timeline 
-            const timeline = Logs.update(
-                {
-                    requests: { $elemMatch: { requestId: requestId } }
-                },
-                { 
-                    code: code,
-                    payload: payload,
-                    status: status
-                }
-            )
-
-            const payload = {};
-            payload.success = status;
-            if ( status ) payload.data = data;
-            if ( !status ) payload.error = data; 
+            // Create a log
+            Logger(req, res, next);
 
             // Send the response
-            res.status(400).json(payload) 
+            res.status(status).json({
+                "success": success,
+                "code": code,
+                "status": status,
+                "data": payload,
+                "request_id": req.requestId,
+            }) 
 
         } else {
             throw new Error('Whoops!') 
         }
 
    } catch (err) {
-        console.error(" Error here ")
+        console.error(`Error: ${err}`)
    }
 
 }
+
+module.exports = handler;

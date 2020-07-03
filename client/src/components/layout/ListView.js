@@ -10,7 +10,7 @@ const ListView = props => {
 	return (
 		<Pane className="container" marginTop={80}>
 			<Card className="container-header">
-				<Heading size={800} marginBottom={30}>My applications</Heading>
+				<Heading size={800} marginBottom={30}>Orientation Applications</Heading>
 					<Button marginLeft={16} fontSize={20} color="#298eea" bottom={5} intent="none">+</Button>				
 					<div className="alignRight">
 					<SearchInput placeholder="Search Application" size={40} />
@@ -21,7 +21,8 @@ const ListView = props => {
 					<Table.TextHeaderCell>Name</Table.TextHeaderCell>
 					<Table.TextHeaderCell>Status</Table.TextHeaderCell>
 					<Table.TextHeaderCell>Created On</Table.TextHeaderCell>
-					<Table.TextHeaderCell>Payment Due</Table.TextHeaderCell>
+					<Table.TextHeaderCell>Student ID</Table.TextHeaderCell>
+					<Table.TextHeaderCell>Reviewd By</Table.TextHeaderCell>
 					<Table.TextHeaderCell></Table.TextHeaderCell>
 				</Table.Head>
 				<Table.Body>
@@ -38,7 +39,10 @@ const ListView = props => {
 						</Table.Cell>
 						
 						<Table.Cell>
-							<Text>$303</Text>
+							<Text>C0730266</Text>
+						</Table.Cell>
+						<Table.Cell>
+							<Text>Arun</Text>
 						</Table.Cell>
 						<Table.Cell>
 							<Popover content={

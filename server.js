@@ -1,5 +1,6 @@
 // Get the required module
 const express = require("express");
+const Logger = require("./src/middleware/Logger.js");
 const connectDB = require("./config/db");
 
 const app = express();
@@ -9,6 +10,9 @@ app.use(express.json());
 
 // Connect to the database
 connectDB();
+
+// Initial handler
+app.use(Logger);
 
 // Get the routes
 const users = require("./src/routes/api/users");
@@ -26,9 +30,6 @@ app.use("/api/auth", auth);
 app.use("/api/roles", roles);
 app.use("/api/groups", groups);
 app.use("/api/services", services);
-
-
-
 
 // Listen to the incoming request to the port
 app.listen(PORT, () => {
