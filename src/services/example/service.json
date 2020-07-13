@@ -1,0 +1,10 @@
+{
+    "name": "service_name",
+    "version": 0.1,
+    "roles": {
+
+    },
+    "endpoint": "",
+    "type": "" 
+}
+
