@@ -1,16 +1,14 @@
 const mongoose = require("mongoose");
-const Schema = new mongoose.Schema();
+const Schema = mongoose.Schema;
 
-const NotificationSchema = Schema({
+const NotificationSchema = new Schema({
     sender: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
-    receiver: [{
-
-    }],
+    receiver: [],
     title: {
-        Type: String,
+        type: String,
         required: true
     },
     content: {
@@ -30,4 +28,4 @@ const NotificationSchema = Schema({
     }
 });
 
-module.exports = NotificationSchema = mongoose.model("Notifications", Notifer);
+module.exports = Notification = mongoose.model("Notifications", NotificationSchema);

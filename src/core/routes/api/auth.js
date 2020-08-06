@@ -6,32 +6,25 @@ const jwt = require("jsonwebtoken");
 const { check, validationResult } = require('express-validator');
 
 // Get the custome middleware
-const middleware = require("../../middleware/auth");
-
+const auth = require("../../middleware/auth");
 // Get the models
 const User = require("../../models/Users");
+// Get the controller
+const controller = require("../../controller/auth");
+// Get the response handler 
+const handler = require("../../middleware/handler")
+
 
 /**
  * @Route   GET /api/users/me
  * @Desc    Get the user infomrmation
  * @Access  Private
  **/
-router.get("/", middleware, async (req, res) => {
-
-    // Get the user data
-    try {
-
-        const user = await User.findById(req.user.id).select("-password");
-        res.json(user);
-
-    } catch(err) {
-
-        console.error(`Error: ${err.message}`);
-        res.status(500).json({"msg": "Server Error"});
-
-    }
-    
-});
+router.get(
+    "/", 
+    auth, 
+    controller.userInfo
+);
 
 /**
  *  @Route   POST /api/users/login
