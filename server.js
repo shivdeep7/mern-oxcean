@@ -19,11 +19,12 @@ app.use(Logger);
  (async () => {
     const compose = new Composer();
     await compose.loadServices();
-    console.log('\x1b[34m%s\x1b[0m', `[Adding service]`, "Loading Core");
+    await compose.deploy();
+   // console.log('\x1b[34m%s\x1b[0m', `[Adding service]`, "Loading Core");
     //compose.loadCore(path.join(__dirname, "/src/core"));  
-    compose.compose();
-    console.log(Core);
-    Core.models.Application.Applications;
+   // compose.compose();
+   //console.log(Services.models.Application.applications);
+   // Core.models.Application.Applications;
 })()
 
 /* Get the routes

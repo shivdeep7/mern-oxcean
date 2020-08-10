@@ -3,7 +3,7 @@
     "version": 0.1,
     "endpoint": "/services/applications",
     "models": [
-        "application.model"
+        "applications"
     ],
     "midlewares": [],
     "constrollers": [],

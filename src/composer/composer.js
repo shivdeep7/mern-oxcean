@@ -1,21 +1,58 @@
 const Services = require("../core/models/services.js")
 const fs = require("fs");
 const path = require("path");
-const { throws } = require("assert");
-const { config } = require("process");
 
+
+/** 
+*
+* @Class         composer 
+* @classdes      Bind the complete entities in one package accessible throughout the application
+* @global        Services - Object to access addons entities
+* @global        Core     - Object to access core entities of the application - Group, handler, notifications, Roles and others
+* @global        Module   - Obeject to access helper modules
+**/
 class Composer {
 
     constructor() {
 
-        this.addonPath = path.join(__dirname, "../services");
-        this.Addon = {};
+        // Main modules types 
+        this.Addons = {};
         this.Core = {};
+        this.services = {};
+        this.helpers = {};
+
+        // Entities within the the module
+        this.middlewares = {};
+        this.models = {};
+        this.validators = {};
+        this.routes = {};
+
+        // File locations 
+        this.corePath = path.join(__dirname, "../core");
+        this.addonPath =  path.join(__dirname, "../services");
         this.serviceFile = "service.json";
 
-        this.services = {};
-
     }
+
+   /**
+    * 
+    * @Desc  Method to load the core applications
+    * 
+    */
+   async loadCore() {
+
+        try {
+            
+            load
+
+        } catch (error) {
+            
+            console.error(error);
+            process.exit(1);
+
+        }
+
+   }
 
    async loadServices() {
         try {
@@ -24,10 +61,21 @@ class Composer {
             services.forEach(service => {
                 
                 console.log('\x1b[34m%s\x1b[0m', `[Adding service]`, service.name);
-                const config = JSON.parse(fs.readFileSync(path.join(this.addonPath, service.name, this.serviceFile)));
-                this.loader(config);
+                const configFile = path.join(this.addonPath, service.name, this.serviceFile);
+                const config = JSON.parse(fs.readFileSync(configFile));
 
-            })
+                if ( typeof config != "object" ) { 
+                    console.log(`Error: [${service}] service file not found`)
+                    process.exit(0); 
+                }
+
+                //this.middlewares[service.name].push(config.middlewares);
+                console.log(config);
+                this.models[service.name]= config.models;
+                //this.validators[service.name].push(config.validators);
+                //this.routes[service.name].push(config.routes);
+
+            });
 
         } catch (err) {
            console.error(err);
@@ -35,15 +83,20 @@ class Composer {
         }
     }
 
+
     loader(config) {
         this.loadModels(config.name, config.models, "addon");
         this.loadMiddlewares(config.name, config.middlewares);
        // this.loadRoute(config.name);
-       
     }
   
-    compose() {
-        global.Core  = this.Core;
+    deploy() {
+
+        // Load the services
+        this.loadModels("services");
+
+       // global.Core  = this.Core;
+        global.Services = this.services; 
     }
 
     async manualLoader(directory) {
@@ -63,44 +116,66 @@ class Composer {
        })
     }
 
-    // Compose the middlewares
-    loadModels(service, models, type) {
-       try {
-        if ( models ) {
-            models.forEach(model => {
-                const modelFile = path.join(this.addonPath, service, "models", `${model}.js`);
-                console.log('\x1b[35m%s\x1b[0m', `Adding Model`, model);
-                if ( type == "addon") {
-                    this.Core.models = {
-                        ...this.Core.models,
-                        [service]: require(modelFile)
-                    }
-                }
-            })
-        }
-       } catch(err) {
-        console.error(err);
-        process.exit(1);
-       }
+    // Load  the models
+    loadModels(type) {
+        this.importer(type, "models");
     }
 
-     // Compose the middlewares
-     loadMiddlewares(service, midlewares) {
-        try {
-            
-            if ( midlewares ) {
-                midlewares.forEach(midleware => {
-                    const requireFile = path.join(this.addonPath, service, "midlewares", `${midleware}.js`);
-                    console.log('\x1b[35m%s\x1b[0m', `Adding Middleware`, midleware);
-                    require(requireFile);
-                })
-            } 
+    /**
+     * 
+     * @Desc       Locate the file based on the parameters
+     * @params     type - Type of the service - Core, Services, Modules
+     * @params     service - Name of the sub service 
+     * @params     fileType - The ref fileType - models, 
+     * @file       Core - src/core
+     * @file       services - src/services/{service}
+     * @file        module - src/modules/module 
+     * 
+     **/
+    locator(service, importType, serviceType, file) {
 
-        } catch(err) {
-         console.error(err);
-         process.exit(1);
-        }
-     }
+        const serviceTypeDir = service != "Core" && serviceType
+        return path.join(__dirname, "../", service, serviceTypeDir, importType, file)
+
+    }
+
+
+
+    // Method to load any service
+    /**
+     * 
+     * @Param  service      - The name of the service we want load - Core, Services, modules 
+     * @Param  importType      - The type of the file we want to load - Middlware, Model, validator and others
+     * 
+     **/
+    importer(service, importType) {
+
+        try {
+
+            if ( typeof this[importType] == "object" ) {
+                Object.keys(this[importType]).forEach(serviceType => {
+                    const importName = this[importType][serviceType];
+                    const modelFile = this.locator(service, importType, serviceType, `${importName}.js`);
+                    console.log(modelFile);
+                    console.log('\x1b[35m%s\x1b[0m', `Adding ${service} ${importType}:`, importName, " in", serviceType);
+                    this[service][importType] = {
+                        [serviceType]: {
+                            ...this[service][importType]?.[serviceType],
+                            [importType]: require(modelFile)
+                        }
+                    }
+                })
+            } else {
+                console.error("The import type does not exits or not a object");
+                process.exit(1);
+            }
+
+           } catch(err) {
+            console.error(err);
+            process.exit(1);
+           }
+
+    }
 
     // Load the content
    
