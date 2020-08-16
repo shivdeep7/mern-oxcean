@@ -45,10 +45,3 @@ app.use("/api/services", services);
 */
 
 
-// Get the port env variable or default 5000
-const PORT = process.env.PORT || 5000;
-
-// Listen to the incoming request to the port
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});

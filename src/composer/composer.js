@@ -1,6 +1,9 @@
 const Services = require("../core/models/services.js")
+const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const { runInThisContext } = require("vm");
+const { forEach } = require("lodash");
 
 
 /** 
@@ -20,11 +23,13 @@ class Composer {
         this.Core = {};
         this.services = {};
         this.helpers = {};
-
+        this.app = express();
+        
         // Entities within the the module
         this.middlewares = {};
         this.models = {};
         this.validators = {};
+        this.controllers = {};
         this.routes = {};
 
         // File locations 
@@ -43,7 +48,9 @@ class Composer {
 
         try {
             
-            load
+            this.models.Core = {
+
+            }
 
         } catch (error) {
             
@@ -61,7 +68,8 @@ class Composer {
             services.forEach(service => {
                 
                 console.log('\x1b[34m%s\x1b[0m', `[Adding service]`, service.name);
-                const configFile = path.join(this.addonPath, service.name, this.serviceFile);
+                const serviceDir = path.join(this.addonPath, service.name);
+                const configFile = path.join(serviceDir, this.serviceFile);
                 const config = JSON.parse(fs.readFileSync(configFile));
 
                 if ( typeof config != "object" ) { 
@@ -69,11 +77,16 @@ class Composer {
                     process.exit(0); 
                 }
 
-                //this.middlewares[service.name].push(config.middlewares);
-                console.log(config);
-                this.models[service.name]= config.models;
-                //this.validators[service.name].push(config.validators);
-                //this.routes[service.name].push(config.routes);
+                this.models[service.name] = config.models;
+                this.validators[service.name] = config.validators;
+                this.middlewares[service.name] = config.middlewares;
+                this.controllers[service.name] = config.controllers;
+
+                // Load the routers
+                this.routes[service.name] = {
+                    endpoint: config.endpoint,
+                    router: path.join(serviceDir, "route.js")
+                };
 
             });
 
@@ -87,16 +100,23 @@ class Composer {
     loader(config) {
         this.loadModels(config.name, config.models, "addon");
         this.loadMiddlewares(config.name, config.middlewares);
-       // this.loadRoute(config.name);
+        this.loadValidator(config.name, config.validators);
+        this.loadControllers(config.name, config.controllers);
+        this.loadRoutes(config.name, config.routes)
     }
   
     deploy() {
 
         // Load the services
         this.loadModels("services");
+        this.loadMiddlewares("services");
+        this.loadValidator("services");
+        this.loadControllers("services");
+        this.loadRoutes("servies")
 
        // global.Core  = this.Core;
         global.Services = this.services; 
+        this.server();
     }
 
     async manualLoader(directory) {
@@ -119,6 +139,38 @@ class Composer {
     // Load  the models
     loadModels(type) {
         this.importer(type, "models");
+    }
+
+    // Load the routers
+    loadRoutes(service) {
+        Object.keys(this.routes).forEach((key) => {
+            this.app.use(`/api/${service}/${route.endpoint}`, require(route.router))
+        })
+    }
+
+    // Load Middlewares
+    loadMiddlewares(type) {
+        this.importer(type, "middlewares");
+    }
+
+    // Run the server
+    server() {
+
+        const PORT = process.env.PORT || 5000;
+        this.app.listen(PORT, () => {
+            console.log(`Server is now running at PORT ${PORT}`)
+        });
+
+    }
+
+     // Load Controllers
+     loadControllers(type) {
+        this.importer(type, "controllers");
+    }
+
+    // Load validators
+    loadValidator(type) {
+        this.importer(type, "validators")
     }
 
     /**
@@ -150,20 +202,27 @@ class Composer {
      **/
     importer(service, importType) {
 
+        console.log(importType, `Loader started`)
         try {
 
             if ( typeof this[importType] == "object" ) {
                 Object.keys(this[importType]).forEach(serviceType => {
-                    const importName = this[importType][serviceType];
-                    const modelFile = this.locator(service, importType, serviceType, `${importName}.js`);
-                    console.log(modelFile);
-                    console.log('\x1b[35m%s\x1b[0m', `Adding ${service} ${importType}:`, importName, " in", serviceType);
-                    this[service][importType] = {
-                        [serviceType]: {
-                            ...this[service][importType]?.[serviceType],
-                            [importType]: require(modelFile)
+                    console.log(this[importType]);
+                    const imports = this[importType][serviceType];
+                    
+                    ( typeof imports == "array" )  && imports.forEach(importName => {
+                        const modelFile = this.locator(service, importType, serviceType, `${importName}.js`);
+                        if ( !fs.existsSync(modelFile) ) { throw   `File does not exists ${modelFile}`}
+                        console.log('\x1b[35m%s\x1b[0m', `Adding ${service} ${importType}:`, importName, "in", serviceType);
+                        this[service][importType] = {
+                            [serviceType]: {
+                                ...this[service][importType]?.[serviceType],
+                                [importType]: require(modelFile)
+                            }
                         }
-                    }
+                    })
+
+
                 })
             } else {
                 console.error("The import type does not exits or not a object");

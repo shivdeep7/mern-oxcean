@@ -1,12 +1,13 @@
 {
     "name": "Application",
     "version": 0.1,
-    "endpoint": "/services/applications",
+    "endpoint": "/applications",
     "models": [
-        "applications"
+        "applications",
+        "documents"
     ],
     "midlewares": [],
-    "constrollers": [],
+    "controllers": [],
     "validators": [],
     "type": ""
 }
