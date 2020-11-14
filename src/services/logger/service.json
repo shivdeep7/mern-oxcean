@@ -1,0 +1,14 @@
+{
+    "name": "Logger",
+    "type": "core",
+    "version": 0.1,
+    "endpoint": "/v1/",
+    "models": [
+        "Logs"
+    ],
+    "midlewares": [
+        "Logger"
+    ],
+    "controllers": [],
+    "validators": []
+}

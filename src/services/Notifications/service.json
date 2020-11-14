@@ -1,0 +1,15 @@
+{
+    "name": "Notifications",
+    "type": "core",
+    "version": 0.1,
+    "endpoint": "/v1/",
+    "models": [
+
+        "Notfications"
+
+    ],
+    "midlewares": [
+    ],
+    "controllers": [],
+    "validators": []
+}

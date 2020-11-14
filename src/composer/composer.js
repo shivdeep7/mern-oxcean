@@ -1,10 +1,7 @@
-const Services = require("../core/models/services.js")
+const ServicesModel = require("./core/models/services")
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const { runInThisContext } = require("vm");
-const { forEach } = require("lodash");
-
 
 /** 
 *
@@ -16,12 +13,12 @@ const { forEach } = require("lodash");
 **/
 class Composer {
 
-    constructor() {
+    constructor(config) {
 
         // Main modules types 
         this.Addons = {};
-        this.Core = {};
-        this.services = {};
+        this.core = {};
+        global.modules = {};
         this.helpers = {};
         this.app = express();
         
@@ -30,64 +27,43 @@ class Composer {
         this.models = {};
         this.validators = {};
         this.controllers = {};
-        this.routes = {};
+        this.routes = [];
+        this.modules = {};
 
         // File locations 
-        this.corePath = path.join(__dirname, "../core");
-        this.addonPath =  path.join(__dirname, "../services");
+
         this.serviceFile = "service.json";
 
     }
 
-   /**
-    * 
-    * @Desc  Method to load the core applications
-    * 
-    */
-   async loadCore() {
-
-        try {
-            
-            this.models.Core = {
-
-            }
-
-        } catch (error) {
-            
-            console.error(error);
-            process.exit(1);
-
-        }
-
-   }
 
    async loadServices() {
         try {
+            const services = await ServicesModel.find({}, {name: 1, type: 1});
 
-            const services = await Services.find({type: "addon"}, {name: 1});
             services.forEach(service => {
-                
                 console.log('\x1b[34m%s\x1b[0m', `[Adding service]`, service.name);
-                const serviceDir = path.join(this.addonPath, service.name);
+                const serviceDir = path.join(path.join(__dirname, "../services"), service.name);
                 const configFile = path.join(serviceDir, this.serviceFile);
                 const config = JSON.parse(fs.readFileSync(configFile));
-
                 if ( typeof config != "object" ) { 
                     console.log(`Error: [${service}] service file not found`)
                     process.exit(0); 
                 }
 
-                this.models[service.name] = config.models;
-                this.validators[service.name] = config.validators;
-                this.middlewares[service.name] = config.middlewares;
-                this.controllers[service.name] = config.controllers;
+                this.models[service.name] = config.models || [];
+                this.validators[service.name] = config.validators || [];
+                this.middlewares[service.name] = config.middlewares || [];
+                this.controllers[service.name] = config.controllers || [];
 
                 // Load the routers
-                this.routes[service.name] = {
-                    endpoint: config.endpoint,
-                    router: path.join(serviceDir, "route.js")
-                };
-
+                this.routes.push(
+                    {
+                        name: service.name,
+                        endpoint: config.endpoint,
+                        router: path.join(serviceDir, "route.js")
+                    }
+                )
             });
 
         } catch (err) {
@@ -96,27 +72,22 @@ class Composer {
         }
     }
 
-
-    loader(config) {
-        this.loadModels(config.name, config.models, "addon");
-        this.loadMiddlewares(config.name, config.middlewares);
-        this.loadValidator(config.name, config.validators);
-        this.loadControllers(config.name, config.controllers);
-        this.loadRoutes(config.name, config.routes)
-    }
   
-    deploy() {
+    async deploy() {
 
-        // Load the services
-        this.loadModels("services");
-        this.loadMiddlewares("services");
-        this.loadValidator("services");
-        this.loadControllers("services");
-        this.loadRoutes("servies")
+       // await this.addServices("core"); // Load the core
+        await this.addServices("services"); // Load the services        
+        // Load the server
+        await this.server();
+    }
 
-       // global.Core  = this.Core;
-        global.Services = this.services; 
-        this.server();
+    // Load a service
+    async addServices(serviceType) {
+        await this.loadModels(serviceType);
+        await this.loadMiddlewares(serviceType);
+        await this.loadValidator(serviceType);
+        await this.loadControllers(serviceType);
+        await this.loadRoutes(serviceType)
     }
 
     async manualLoader(directory) {
@@ -125,7 +96,7 @@ class Composer {
            const current = path.join(directory, subdir);
           
            if ( fs.lstatSync(current).isDirectory() ) {
-                this.loadCore(current);
+                this.manualLoader(current);
            } 
 
            if ( fs.lstatSync(current).isFile() && path.extname(current) == ".js" ) {
@@ -142,9 +113,15 @@ class Composer {
     }
 
     // Load the routers
-    loadRoutes(service) {
-        Object.keys(this.routes).forEach((key) => {
-            this.app.use(`/api/${service}/${route.endpoint}`, require(route.router))
+     loadRoutes(service) {
+
+        console.log("---------------------------");
+        console.log("Router Loading started");
+
+        this.routes.forEach(async (route) => {
+            const router = `/api/${service}/${route.endpoint}`;
+            console.log("Loading router");
+            this.app.use(router, require(route.router))
         })
     }
 
@@ -152,12 +129,13 @@ class Composer {
     loadMiddlewares(type) {
         this.importer(type, "middlewares");
     }
+    
 
     // Run the server
     server() {
 
         const PORT = process.env.PORT || 5000;
-        this.app.listen(PORT, () => {
+        this.app.listen(PORT, (err) => {
             console.log(`Server is now running at PORT ${PORT}`)
         });
 
@@ -186,8 +164,9 @@ class Composer {
      **/
     locator(service, importType, serviceType, file) {
 
-        const serviceTypeDir = service != "Core" && serviceType
-        return path.join(__dirname, "../", service, serviceTypeDir, importType, file)
+    
+        return path.join(__dirname, "../", service, serviceType, importType, file)
+    
 
     }
 
@@ -196,32 +175,43 @@ class Composer {
     // Method to load any service
     /**
      * 
-     * @Param  service      - The name of the service we want load - Core, Services, modules 
-     * @Param  importType      - The type of the file we want to load - Middlware, Model, validator and others
+     * @Param  service    - The name of the service we want load - Core, Services, modules 
+     * @Param  importType - The type of the file we want to load - Middlware, Model, validator and others
      * 
      **/
     importer(service, importType) {
 
+        console.log("----------------------------")
         console.log(importType, `Loader started`)
         try {
 
             if ( typeof this[importType] == "object" ) {
+                
+                // Loop through all the files in the importer
                 Object.keys(this[importType]).forEach(serviceType => {
-                    console.log(this[importType]);
-                    const imports = this[importType][serviceType];
                     
-                    ( typeof imports == "array" )  && imports.forEach(importName => {
-                        const modelFile = this.locator(service, importType, serviceType, `${importName}.js`);
-                        if ( !fs.existsSync(modelFile) ) { throw   `File does not exists ${modelFile}`}
-                        console.log('\x1b[35m%s\x1b[0m', `Adding ${service} ${importType}:`, importName, "in", serviceType);
-                        this[service][importType] = {
-                            [serviceType]: {
-                                ...this[service][importType]?.[serviceType],
-                                [importType]: require(modelFile)
-                            }
-                        }
-                    })
+                    const imports = this[importType][serviceType];
 
+                    if ( typeof imports != "object" ) {
+                        console.log("Invalid imports");
+                        process.exit(1);
+                     }
+
+                     if ( modules[importType] == undefined ) {
+                        modules[importType] = {}
+                     }
+                     return imports.forEach(importName => {
+                        const importFile = this.locator(service, importType, serviceType, `${importName}.js`);
+                        
+                        if ( !fs.existsSync(importFile) ) { throw   `File does not exists ${importFile}`}
+                        console.log('\x1b[35m%s\x1b[0m', `Adding ${service} ${importType}:`, importName, "in", serviceType);
+                        
+                        modules[importType][serviceType] = {
+                           ...(modules[importType] && modules[importType][serviceType]),
+                           [importName]: require(importFile)
+                       };
+                    }) 
+                    
 
                 })
             } else {

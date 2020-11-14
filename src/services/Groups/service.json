@@ -1,0 +1,16 @@
+{
+    "name": "Core",
+    "type": "core",
+    "version": 0.1,
+    "endpoint": "/v1/",
+    "models": [
+        "Groups"
+    ],
+    "midlewares": [
+        "Groups"
+    ],
+    "controllers": [],
+    "validators": [
+        "Groups"
+    ]
+}
