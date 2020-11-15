@@ -12,5 +12,8 @@
     "controllers": [],
     "validators": [
         "Groups"
+    ],
+    "dependency": [
+        "Roles"
     ]
 }

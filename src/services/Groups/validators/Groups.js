@@ -1,6 +1,6 @@
 const Groups = require("../models/Groups");
 const mongoose = require("mongoose");
-const rolesValidator = require("./Roles.js")
+//const rolesValidator = require("./Roles.js")
 
 // Get the group by name
 const GroupExitsByName = async (name, status) => {

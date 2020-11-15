@@ -2,6 +2,7 @@ const ServicesModel = require("./core/models/services")
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const _ = require("lodash");
 
 /** 
 *
@@ -29,6 +30,7 @@ class Composer {
         this.controllers = {};
         this.routes = [];
         this.modules = {};
+        this.sorted = [];
 
         // File locations 
 
@@ -36,47 +38,71 @@ class Composer {
 
     }
 
-
-   async loadServices() {
-        try {
-            const services = await ServicesModel.find({}, {name: 1, type: 1});
-
-            services.forEach(service => {
-                console.log('\x1b[34m%s\x1b[0m', `[Adding service]`, service.name);
-                const serviceDir = path.join(path.join(__dirname, "../services"), service.name);
-                const configFile = path.join(serviceDir, this.serviceFile);
-                const config = JSON.parse(fs.readFileSync(configFile));
-                if ( typeof config != "object" ) { 
-                    console.log(`Error: [${service}] service file not found`)
-                    process.exit(0); 
-                }
-
-                this.models[service.name] = config.models || [];
-                this.validators[service.name] = config.validators || [];
-                this.middlewares[service.name] = config.middlewares || [];
-                this.controllers[service.name] = config.controllers || [];
-
-                // Load the routers
-                this.routes.push(
-                    {
-                        name: service.name,
-                        endpoint: config.endpoint,
-                        router: path.join(serviceDir, "route.js")
-                    }
-                )
-            });
-
-        } catch (err) {
-           console.error(err);
-           process.exit(1);
+   
+    async dependencies(object, callback) {
+        for (let i in object) {
+            const data = object[i];
+            if (this.sorted.indexOf(data.name) == -1) {
+                if ("dependencies" in data) {
+                    const nestedDependency = object.filter(x => data.dependencies.indexOf(x.name) != -1);
+                    // Find the dependency in the dependency
+                    await this.dependencies(nestedDependency, callback);
+                }		
+                await callback(data);
+                await this.sorted.push(data.name);
+            }
         }
     }
+    
+ 
+
+
+   async loadServices() {
+    try {
+        
+        const services = await ServicesModel.find({}).lean();
+        await this.dependencies(services, this.configExtractor.bind(this));
+      
+
+    } catch (err) {
+       console.error(err);
+       process.exit(1);
+    }
+}
+
+   configExtractor(service) {
+        console.log('\x1b[34m%s\x1b[0m', `[Adding service]`, service.name);
+        const serviceDir = path.join(path.join(__dirname, "../services"), service.name);
+        const configFile = path.join(serviceDir, this.serviceFile);
+        const config = JSON.parse(fs.readFileSync(configFile));
+    
+        if ( typeof config != "object" ) { 
+            console.log(`Error: [${service}] service file not found`)
+            process.exit(0); 
+        }
+
+        this.models[service.name] = config.models || [];
+        this.validators[service.name] = config.validators || [];
+        this.middlewares[service.name] = config.middlewares || [];
+        this.controllers[service.name] = config.controllers || [];
+
+        // Load the routers
+        this.routes.push(
+            {
+                name: service.name,
+                endpoint: config.endpoint,
+                router: path.join(serviceDir, "route.js")
+            }
+        )
+   }
+
+ 
 
   
     async deploy() {
 
        // await this.addServices("core"); // Load the core
-        await this.addServices("services"); // Load the services        
+        //await this.addServices("services"); // Load the services        
         // Load the server
         await this.server();
     }

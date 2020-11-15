@@ -1,7 +1,9 @@
-console.log(modules);
 const Roles = require("../models/Roles");
 const mongoose = require("mongoose");
-const serviceValidator = require("./Services.js")
+//const serviceValidator = require("./Services.js")
+
+console.log(modules);
+
 
 // Check if the role exits 
 const RoleExitsByName = async (name, status) => {
